@@ -2,6 +2,8 @@ import SwiftUI
 
 struct StreakCard: View {
     var streak: Int
+    var completionTier: Int = 0
+
     
     var body: some View {
         VoidCard(intensity: 80, cornerRadius: 24) {

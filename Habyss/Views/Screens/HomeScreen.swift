@@ -3,79 +3,159 @@ import SwiftData
 
 struct HomeScreen: View {
     @Query(filter: #Predicate<Habit> { !$0.isArchived }) var habits: [Habit]
+    @Environment(\.modelContext) private var modelContext
+    
+    @State private var showGoalsModal = false
+    @State private var showStreakModal = false
+    @State private var showConsistencyModal = false
+    @State private var showAIModal = false
+    @State private var showNotificationsModal = false
+    
+    var todaysHabits: [Habit] {
+        habits.filter { habit in
+            let calendar = Calendar.current
+            let today = calendar.startOfDay(for: Date())
+            
+            // Check if the habit is scheduled for today
+            let isScheduledToday = habit.schedule.contains { day in
+                let weekday = calendar.component(.weekday, from: today)
+                return day.rawValue == weekday
+            }
+            
+            // If the habit is scheduled for today, include it
+            return isScheduledToday
+        }
+    }
     
     var body: some View {
-        ZStack {
-            // Background
-            Color.habyssBlack.ignoresSafeArea()
-            
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Header
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text("Welcome back,")
-                                .font(.subheadline)
-                                .foregroundStyle(Color.textSecondary)
-                            Text("Traveler") // TODO: Profile Name
-                                .font(.title)
-                                .fontWeight(.bold)
-                                .foregroundStyle(Color.textPrimary)
-                        }
-                        Spacer()
-                        
-                        // Avatar
-                        Circle()
-                            .fill(Color.habyssNavy)
-                            .frame(width: 44, height: 44)
-                            .overlay(
+        NavigationView {
+            ZStack {
+                Color.habyssBlack.ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Header: Profile & Notifications
+                        HStack {
+                            ZStack {
+                                Circle()
+                                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                                    .frame(width: 44, height: 44)
+                                
                                 Image(systemName: "person.fill")
-                                    .foregroundStyle(Color.habyssBlue)
-                            )
-                    }
-                    .padding(.horizontal)
-                    .padding(.top, 20)
-                    
-                    // Bento Grid (Stats)
-                    HStack(spacing: 12) {
-                        StreakCard(streak: 3) // TODO: Calculate Real Streak
-                            .frame(height: 140)
+                                    .foregroundStyle(Color.textSecondary)
+                            }
+                            
+                            Spacer()
+                            
+                            HStack(spacing: 12) {
+                                Button(action: { showAIModal = true }) {
+                                    Circle()
+                                        .fill(LinearGradient(colors: [.habyssBlue, .habyssPurple], startPoint: .topLeading, endPoint: .bottomTrailing))
+                                        .frame(width: 40, height: 40)
+                                        .overlay(Image(systemName: "sparkles").foregroundStyle(.white))
+                                }
+                                
+                                Button(action: { showNotificationsModal = true }) {
+                                    Circle()
+                                        .fill(Color.white.opacity(0.05))
+                                        .frame(width: 40, height: 40)
+                                        .overlay(Image(systemName: "bell.fill").foregroundStyle(.white))
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.top, 10)
                         
-                        ConsistencyCard(score: 85) // TODO: Calculate Real Consistency
-                            .frame(height: 140)
-                    }
-                    .padding(.horizontal)
-                    
-                    // Today's Habits
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("TODAY'S MISSION")
-                            .font(.caption)
-                            .fontWeight(.bold)
-                            .tracking(1)
-                            .foregroundStyle(Color.textSecondary)
-                            .padding(.horizontal)
+                        // Motivational Quote (Typewriter Style)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Consistency beats intensity.")
+                                .font(.subheadline)
+                                .fontWeight(.bold)
+                                .foregroundStyle(Color.white)
+                            Text("You've got this.")
+                                .font(.caption)
+                                .foregroundStyle(Color.habyssBlue)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
                         
-                        if habits.isEmpty {
-                            ContentUnavailableView(
-                                "No Habits Yet",
-                                systemImage: "sparkles",
-                                description: Text("Tap the + button to create your first habit.")
-                            )
-                            .foregroundStyle(Color.textSecondary)
-                            .padding(.top, 40)
-                        } else {
-                            LazyVStack(spacing: 12) {
-                                ForEach(habits) { habit in
-                                    HabitRow(habit: habit)
+                        // Goals Progress Bar Summary
+                        Button(action: { showGoalsModal = true }) {
+                            VoidCard(intensity: 40, cornerRadius: 16) {
+                                HStack {
+                                    VStack(alignment: .leading) {
+                                        Text("Mission Status")
+                                            .font(.caption)
+                                            .fontWeight(.bold)
+                                            .foregroundStyle(Color.textSecondary)
+                                        Text("85% On Track")
+                                            .font(.title3)
+                                            .fontWeight(.bold)
+                                            .foregroundStyle(Color.white)
+                                    }
+                                    Spacer()
+                                    CircularProgress(progress: 0.85, size: 40, color: .habyssBlue)
+                                }
+                                .padding(12)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal)
+
+                        // Bento Grid Stats
+                        HStack(spacing: 12) {
+                            Button(action: { showStreakModal = true }) {
+                                StreakCard(streak: 12, completionTier: 3)
+                            }
+                            .buttonStyle(.plain)
+                            
+                            Button(action: { showConsistencyModal = true }) {
+                                ConsistencyCard(score: 88)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .padding(.horizontal)
+                        
+                        // Today's Habits
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Text("TODAY'S HABITS")
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(Color.textSecondary)
+                                    .tracking(1)
+                                
+                                Spacer()
+                                
+                                NavigationLink(destination: RoadmapScreen()) { // Link to Calendar
+                                    Text("See All")
+                                        .font(.caption)
+                                        .foregroundStyle(Color.textTertiary)
                                 }
                             }
                             .padding(.horizontal)
+                            
+                            if todaysHabits.isEmpty {
+                                ContentUnavailableView("No Mission", systemImage: "moon.stars.fill", description: Text("Rest day."))
+                                    .foregroundStyle(Color.textSecondary)
+                            } else {
+                                ForEach(todaysHabits) { habit in
+                                    NavigationLink(destination: HabitDetailScreen(habit: habit)) {
+                                        HabitRow(habit: habit)
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
                         }
+                        .padding(.bottom, 100)
                     }
-                    
-                    Spacer(minLength: 100)
                 }
             }
+            .sheet(isPresented: $showGoalsModal) { GoalsGridModal(isPresented: $showGoalsModal) }
+            .sheet(isPresented: $showStreakModal) { StreakModal(isPresented: $showStreakModal) }
+            .sheet(isPresented: $showConsistencyModal) { ConsistencyModal(isPresented: $showConsistencyModal) }
+            .fullScreenCover(isPresented: $showAIModal) { AIAgentView(isPresented: $showAIModal) }
+            .sheet(isPresented: $showNotificationsModal) { NotificationsView(isPresented: $showNotificationsModal) }
         }
     }
 }
@@ -167,4 +247,22 @@ struct HabitRow: View {
 #Preview {
     HomeScreen()
         .modelContainer(for: [Habit.self, Completion.self, Profile.self], inMemory: true)
+}
+
+struct CircularProgress: View {
+    let progress: Double
+    let size: CGFloat
+    let color: Color
+    
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(Color.white.opacity(0.1), lineWidth: 4)
+            Circle()
+                .trim(from: 0, to: progress)
+                .stroke(color, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+        }
+        .frame(width: size, height: size)
+    }
 }

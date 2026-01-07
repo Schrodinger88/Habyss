@@ -104,10 +104,6 @@ struct GlassDock: View {
 }
 
 // Temporary Placeholders for Screens
-struct HomeScreen: View { var body: some View { Color.habyssBlack.ignoresSafeArea() } }
-struct RoadmapScreen: View { var body: some View { Color.habyssBlack.ignoresSafeArea() } }
-struct CommunityScreen: View { var body: some View { Color.habyssBlack.ignoresSafeArea() } }
-struct ProfileScreen: View { var body: some View { Color.habyssBlack.ignoresSafeArea() } }
 
 #Preview {
     MainTabView()
