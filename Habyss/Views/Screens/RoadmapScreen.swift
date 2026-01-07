@@ -110,7 +110,7 @@ struct RoadmapGoalCard: View {
     }
     
     var body: some View {
-        VoidCard(intensity: 30, cornerRadius: 16) {
+        VoidCard(intensity: 30.0, cornerRadius: 16) {
             VStack(spacing: 16) {
                 HStack(alignment: .top, spacing: 16) {
                     // Icon Box
@@ -183,6 +183,43 @@ struct RoadmapGoalCard: View {
                 }
             }
             .padding(16)
+        }
+    }
+}
+
+struct CalendarDayButton: View {
+    let date: Date
+    let isSelected: Bool
+    let onSelect: () -> Void
+    
+    var body: some View {
+        Button(action: onSelect) {
+            VStack(spacing: 6) {
+                Text(date.formatted(.dateTime.weekday(.abbreviated)).uppercased())
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(isSelected ? .white : Color.textTertiary)
+                
+                Text(date.formatted(.dateTime.day()))
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(isSelected ? .white : Color.textSecondary)
+                
+                if isSelected {
+                    Circle()
+                        .fill(Color.habyssPurple)
+                        .frame(width: 4, height: 4)
+                } else {
+                    Color.clear.frame(width: 4, height: 4)
+                }
+            }
+            .frame(width: 50, height: 70)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isSelected ? Color.habyssPurple.opacity(0.2) : Color.white.opacity(0.05))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isSelected ? Color.habyssPurple.opacity(0.5) : Color.white.opacity(0.05), lineWidth: 1)
+            )
         }
     }
 }

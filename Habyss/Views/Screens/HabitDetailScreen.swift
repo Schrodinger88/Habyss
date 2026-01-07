@@ -31,7 +31,7 @@ struct HabitDetailScreen: View {
                 VStack(spacing: 24) {
                     
                     // Main Info Card
-                    VoidCard(intensity: 60, cornerRadius: 24) {
+                    VoidCard(intensity: 60.0, cornerRadius: 24) {
                         VStack(spacing: 16) {
                             ZStack {
                                 Circle()
@@ -63,7 +63,7 @@ struct HabitDetailScreen: View {
                                 .fontWeight(.bold)
                                 .font(.callout)
                                 .padding(.horizontal, 24)
-                                .paddingVertical(12)
+                                .padding(.vertical, 12)
                                 .background(isCompletedToday ? Color.habyssGreen : Color.habyssBlue)
                                 .foregroundStyle(.white)
                                 .cornerRadius(12)
@@ -81,7 +81,7 @@ struct HabitDetailScreen: View {
                             .tracking(1)
                             .foregroundStyle(Color.textSecondary)
                         
-                        VoidCard(intensity: 40, cornerRadius: 16) {
+                        VoidCard(intensity: 40.0, cornerRadius: 16) {
                             Chart {
                                 ForEach(last30DaysHistory, id: \.date) { data in
                                     BarMark(
@@ -116,7 +116,7 @@ struct HabitDetailScreen: View {
                     }
                     
                     // Directive
-                    VoidCard(intensity: 30, cornerRadius: 16) {
+                    VoidCard(intensity: 30.0, cornerRadius: 16) {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("DIRECTIVE")
                                 .font(.caption)
@@ -204,7 +204,7 @@ struct StatCard: View {
     let color: Color
     
     var body: some View {
-        VoidCard(intensity: 40, cornerRadius: 16) {
+        VoidCard(intensity: 40.0, cornerRadius: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {

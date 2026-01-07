@@ -113,7 +113,7 @@ struct NotificationRow: View {
                     Circle()
                         .fill(notification.type.color.opacity(0.2))
                         .frame(width: 40, height: 40)
-                    Image(systemName: notification.icon)
+                    Image(systemName: notification.type.icon)
                         .foregroundStyle(notification.type.color)
                         .font(.caption)
                 }

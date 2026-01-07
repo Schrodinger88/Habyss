@@ -28,7 +28,7 @@ struct AnalyticsDashboard: View {
     var body: some View {
         VStack(spacing: 16) {
             // Life Balance Matrix Card
-            VoidCard(intensity: 90, cornerRadius: 24) {
+            VoidCard(intensity: 90.0, cornerRadius: 24) {
                 VStack {
                     Text("LIFE BALANCE MATRIX")
                         .font(.system(size: 10, weight: .bold)) // Lexend 10, 700
@@ -47,7 +47,7 @@ struct AnalyticsDashboard: View {
             let total = habits.count
             let progress = total > 0 ? Int((Double(done) / Double(total)) * 100) : 0
             
-            VoidCard(intensity: 90, cornerRadius: 16) {
+            VoidCard(intensity: 90.0, cornerRadius: 16) {
                 HStack {
                     HStack(spacing: 12) {
                         Circle()

@@ -33,7 +33,175 @@ struct HomeScreen: View {
         }
     }
     
-    // ... (rest of body) ...
+    // Mock Stats for Demo (In real app, calculate from history)
+    var averageGoalProgress: Double { 85.0 }
+    var currentStreak: Int { 12 }
+    var completionTier: Int { 3 }
+    var consistencyScore: Int { 88 }
+    
+    func startTypewriter() {
+        displayedQuote = ""
+        for (index, char) in quoteText.enumerated() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.05) {
+                displayedQuote += String(char)
+            }
+        }
+    }
+    
+    func isCompletedToday(_ habit: Habit) -> Bool {
+        let calendar = Calendar.current
+        return habit.completions.contains { calendar.isDateInToday($0.date) }
+    }
+    
+    func toggleCompletion(for habit: Habit) {
+        let today = Date()
+        let calendar = Calendar.current
+        if let existing = habit.completions.first(where: { calendar.isDateInToday($0.date) }) {
+            habit.completions.removeAll { $0.id == existing.id }
+            modelContext.delete(existing)
+        } else {
+            let completion = Completion(date: today)
+            habit.completions.append(completion)
+        }
+    }
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color.habyssBlack.ignoresSafeArea()
+                
+                // Header
+                HStack {
+                    // Avatar (Parity with Expo: 44x44, clean border)
+                    Button(action: {}) { // Link to Profile
+                        ZStack {
+                            Circle()
+                                .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                .frame(width: 44, height: 44)
+                            
+                            Image(systemName: "person.fill")
+                                .font(.system(size: 20))
+                                .foregroundStyle(Color.white.opacity(0.6))
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    HStack(spacing: 12) {
+                        // AI Sparkles (Gradient: Blue -> Purple -> Pink)
+                        Button(action: { showAIModal = true }) {
+                            Circle()
+                                .fill(LinearGradient(colors: [.habyssBlue, .habyssPurple, .habyssPink], startPoint: .topLeading, endPoint: .bottomTrailing))
+                                .frame(width: 40, height: 40)
+                                .overlay(Image(systemName: "sparkles").font(.system(size: 18)).foregroundStyle(.white))
+                        }
+                        
+                        // Notifications
+                        Button(action: { showNotificationsModal = true }) {
+                            Circle()
+                                 .fill(Color.white.opacity(0.05))
+                                 .frame(width: 40, height: 40)
+                                 .overlay(Image(systemName: "bell.fill").font(.system(size: 20)).foregroundStyle(.white))
+                        }
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.top, 20)
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        
+                        // Motivational Quote (Typewriter Effect)
+                        VStack(alignment: .leading) {
+                            Text(displayedQuote + (displayedQuote.count < quoteText.count ? "|" : ""))
+                                .font(.system(size: 14, weight: .bold, design: .rounded)) // Lexend 700
+                                .foregroundStyle(Color.textSecondary)
+                                .lineLimit(2)
+                                .multilineTextAlignment(.leading)
+                                .onAppear {
+                                    startTypewriter()
+                                }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
+                        
+                        // Goals Progress (Linear Bar - Parity)
+                        Button {
+                            showGoalsModal = true
+                        } label: {
+                            VoidCard(intensity: 80.0) {
+                                VStack(spacing: 16) {
+                                    HStack {
+                                        HStack(spacing: 10) {
+                                            Image(systemName: "flag.fill").foregroundStyle(Color.habyssPurple)
+                                            Text("GOALS PROGRESS")
+                                                .font(.system(size: 14, weight: .black))
+                                                .tracking(1.5)
+                                                .foregroundStyle(.white)
+                                        }
+                                        Spacer()
+                                        HStack(spacing: 4) {
+                                            Text("\(goals.count)")
+                                                .font(.system(size: 12, weight: .bold))
+                                                .foregroundStyle(Color.white.opacity(0.6))
+                                            Image(systemName: "chevron.forward")
+                                                .font(.system(size: 12))
+                                                .foregroundStyle(Color.white.opacity(0.4))
+                                        }
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .background(Color.white.opacity(0.05))
+                                        .cornerRadius(12)
+                                    }
+                                    
+                                    HStack(spacing: 16) {
+                                        // Linear Bar
+                                        GeometryReader { geo in
+                                            ZStack(alignment: .leading) {
+                                                Capsule()
+                                                    .fill(Color.white.opacity(0.08))
+                                                
+                                                Capsule()
+                                                    .fill(LinearGradient(colors: [.habyssBlue, .habyssPurple], startPoint: .leading, endPoint: .trailing))
+                                                    .frame(width: geo.size.width * CGFloat(averageGoalProgress) / 100)
+                                            }
+                                        }
+                                        .frame(height: 6)
+                                        
+                                        Text("\(Int(averageGoalProgress))%")
+                                            .font(.system(size: 24, weight: .black))
+                                            .foregroundStyle(.white)
+                                            .frame(width: 60, alignment: .trailing)
+                                    }
+                                    
+                                    Text("TRACK YOUR ACTIVE MISSIONS")
+                                        .font(.system(size: 10))
+                                        .tracking(1)
+                                        .foregroundStyle(Color.white.opacity(0.4))
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                                .padding(20)
+                            }
+                        }
+                        .padding(.horizontal)
+                        
+                        // Streak & Consistency (Bento Row)
+                        HStack(spacing: 12) {
+                             Button(action: { showStreakModal = true }) {
+                                 StreakCard(streak: currentStreak, completionTier: completionTier)
+                             }
+                             
+                             Button(action: { showConsistencyModal = true }) {
+                                 ConsistencyCard(score: consistencyScore)
+                             }
+                        }
+                        .padding(.horizontal)
+                        
+                        // Analytics Dashboard (Radar Chart)
+                        AnalyticsDashboard(habits: habits, completions: habits.reduce(into: [:]) { dict, habit in
+                            dict[habit.id] = isCompletedToday(habit)
+                        })
+                        .padding(.horizontal)
 
                         // Habits List ("Quick Habits")
                         VStack(alignment: .leading, spacing: 16) {
@@ -58,7 +226,6 @@ struct HomeScreen: View {
                                     }
                                     .buttonStyle(.plain)
                                 }
-                            }
                             }
                         }
                         .padding(.bottom, 100)
@@ -86,7 +253,7 @@ struct HabitRow: View {
     }
     
     var body: some View {
-        VoidCard(intensity: 60, cornerRadius: 16) {
+        VoidCard(intensity: 60.0, cornerRadius: 16) {
             HStack(spacing: 16) {
                 // Icon / Left Checkmark
                 ZStack {

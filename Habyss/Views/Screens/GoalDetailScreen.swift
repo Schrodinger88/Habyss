@@ -145,7 +145,7 @@ struct GoalDetailScreen: View {
             
             HStack(spacing: 16) {
                 // Circular Progress
-                VoidCard(intensity: 40, cornerRadius: 20) {
+                VoidCard(intensity: 40.0, cornerRadius: 20) {
                     ZStack {
                         Circle()
                             .stroke(Color.white.opacity(0.1), lineWidth: 12)
@@ -170,7 +170,7 @@ struct GoalDetailScreen: View {
                 
                 // Stats Grid
                 VStack(spacing: 16) {
-                    VoidCard(intensity: 40, cornerRadius: 16) {
+                    VoidCard(intensity: 40.0, cornerRadius: 16) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("\(completedTasks)")
                                 .font(.title2)
@@ -184,7 +184,7 @@ struct GoalDetailScreen: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     
-                    VoidCard(intensity: 40, cornerRadius: 16) {
+                    VoidCard(intensity: 40.0, cornerRadius: 16) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("\(remainingTasks)")
                                 .font(.title2)
@@ -215,7 +215,7 @@ struct GoalDetailScreen: View {
                         .foregroundStyle(Color.textTertiary)
                 }
                 
-                VoidCard(intensity: 30, cornerRadius: 16) {
+                VoidCard(intensity: 30.0, cornerRadius: 16) {
                     Chart(linkedHabits) { habit in
                         // Mocking activity data over time based on completion dates
                         ForEach(habit.completions) { completion in

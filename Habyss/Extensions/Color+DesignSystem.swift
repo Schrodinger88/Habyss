@@ -11,6 +11,8 @@ extension Color {
     static let habyssCoral = Color(hex: "FF4757")
     static let habyssPink = Color(hex: "EC4899")
     static let habyssTeal = Color(hex: "4ECDC4")
+    static let habyssGreen = Color(hex: "10B981")
+    static let habyssRed = Color(hex: "EF4444")
     
     // MARK: - Text
     static let textPrimary = Color(hex: "E0E6ED")

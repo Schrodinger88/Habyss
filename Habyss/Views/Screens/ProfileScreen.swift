@@ -24,7 +24,7 @@ struct ProfileScreen: View {
                                 
                                 if isPremium {
                                     Circle()
-                                        .stroke(LinearGradient(colors: [.habyssBlue, .habyssPurple, .habyssPink], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 3)
+                                        .stroke(LinearGradient(colors: [Color.habyssBlue, Color.habyssPurple, Color.habyssPink], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 3)
                                         .frame(width: 94, height: 94)
                                     
                                     // Pro Badge

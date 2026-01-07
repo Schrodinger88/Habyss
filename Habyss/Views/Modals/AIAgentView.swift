@@ -42,7 +42,7 @@ struct AIAgentView: View {
                         HStack(spacing: 6) {
                             Image(systemName: "sparkles")
                                 .font(.caption)
-                                .foregroundStyle(LinearGradient(colors: [.habyssBlue, .habyssPink], startPoint: .leading, endPoint: .trailing))
+                                .foregroundStyle(LinearGradient(colors: [Color.habyssBlue, Color.habyssPink], startPoint: .leading, endPoint: .trailing))
                             Text("HABYSS AI")
                                 .font(.headline)
                                 .fontWeight(.heavy)
@@ -212,7 +212,7 @@ struct MessageBubble: View {
             if message.role == .assistant {
                 // Avatar
                  Circle()
-                    .fill(LinearGradient(colors: [.habyssBlue, .habyssPink], startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .fill(LinearGradient(colors: [Color.habyssBlue, Color.habyssPink], startPoint: .topLeading, endPoint: .bottomTrailing))
                     .frame(width: 28, height: 28)
                     .overlay(Image(systemName: "sparkles").font(.caption2).foregroundStyle(.white))
             } else {
