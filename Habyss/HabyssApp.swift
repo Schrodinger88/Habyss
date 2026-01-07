@@ -12,7 +12,9 @@ import SwiftData
 struct HabyssApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Habit.self,
+            Completion.self,
+            Profile.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
