@@ -79,7 +79,14 @@ struct AIAgentView: View {
                                 }
                                 .padding(12)
                                 .background(Color.white.opacity(0.05))
-                                .cornerRadius(12, corners: [.topRight, .bottomLeft, .bottomRight])
+                                .clipShape(
+                                    .rect(
+                                        topLeadingRadius: 12,
+                                        bottomLeadingRadius: 4,
+                                        bottomTrailingRadius: 12,
+                                        topTrailingRadius: 12
+                                    )
+                                )
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.horizontal)
                             }

@@ -192,14 +192,14 @@ struct HomeScreen: View {
                              }
                              
                              Button(action: { showConsistencyModal = true }) {
-                                 ConsistencyCard(score: consistencyScore)
+                                 ConsistencyCard(score: Double(consistencyScore))
                              }
                         }
                         .padding(.horizontal)
                         
                         // Analytics Dashboard (Radar Chart)
                         AnalyticsDashboard(habits: habits, completions: habits.reduce(into: [:]) { dict, habit in
-                            dict[habit.id] = isCompletedToday(habit)
+                            dict[habit.id.uuidString] = isCompletedToday(habit)
                         })
                         .padding(.horizontal)
 

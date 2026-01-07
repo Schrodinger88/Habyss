@@ -77,31 +77,39 @@ struct ProfileScreen: View {
                         // Settings Sections
                         VStack(spacing: 24) {
                             SettingsSection(title: "APP PREFERENCES") {
-                                SettingsRow(icon: "sparkles", iconColor: .habyssPurple, title: "AI Personality", subtitle: "Customize your AI coach", action: {})
+                                NavigationLink(destination: AIPersonalityView().navigationBarHidden(true)) {
+                                    SettingsRow(icon: "sparkles", iconColor: .habyssPurple, title: "AI Personality", subtitle: "Customize your AI coach")
+                                }
                                 Divider().background(Color.white.opacity(0.1))
-                                SettingsRow(icon: "bell", iconColor: .habyssBlue, title: "Notifications", subtitle: "Manage alerts & reminders", action: {})
+                                NavigationLink(destination: NotificationSettingsView().navigationBarHidden(true)) {
+                                    SettingsRow(icon: "bell", iconColor: .habyssBlue, title: "Notifications", subtitle: "Manage alerts & reminders")
+                                }
                                 Divider().background(Color.white.opacity(0.1))
-                                SettingsRow(icon: "paintpalette", iconColor: .habyssPink, title: "Appearance", subtitle: "Theme, colors, & display", action: {})
+                                NavigationLink(destination: AppearanceSettingsView().navigationBarHidden(true)) {
+                                    SettingsRow(icon: "paintpalette", iconColor: .habyssPink, title: "Appearance", subtitle: "Theme, colors, & display")
+                                }
                             }
                             
                             SettingsSection(title: "DATA & SYNC") {
-                                SettingsRow(icon: "icloud.and.arrow.up", iconColor: .green, title: "Backup & Restore", subtitle: "Cloud sync & data export", action: {})
+                                NavigationLink(destination: BackupSettingsView().navigationBarHidden(true)) {
+                                    SettingsRow(icon: "icloud.and.arrow.up", iconColor: .green, title: "Backup & Restore", subtitle: "Cloud sync & data export")
+                                }
                                 Divider().background(Color.white.opacity(0.1))
-                                SettingsRow(icon: "link", iconColor: .habyssBlue, title: "Integrations", subtitle: "Calendar, Health", action: {})
+                                SettingsRow(icon: "link", iconColor: .habyssBlue, title: "Integrations", subtitle: "Calendar, Health") // Placeholder
                             }
                             
                             SettingsSection(title: "ACCOUNT") {
-                                SettingsRow(icon: "star", iconColor: .habyssPurple, title: "Subscription", subtitle: "Manage your plan", action: {})
+                                SettingsRow(icon: "star", iconColor: .habyssPurple, title: "Subscription", subtitle: "Manage your plan")
                                 Divider().background(Color.white.opacity(0.1))
-                                SettingsRow(icon: "shield.checkerboard", iconColor: .orange, title: "Privacy & Security", subtitle: "Data & security options", action: {})
+                                SettingsRow(icon: "shield.checkerboard", iconColor: .orange, title: "Privacy & Security", subtitle: "Data & security options")
                             }
                             
                             SettingsSection(title: "SUPPORT") {
-                                SettingsRow(icon: "questionmark.circle", iconColor: .gray, title: "Help Center", subtitle: "FAQs and guides", action: {})
+                                SettingsRow(icon: "questionmark.circle", iconColor: .gray, title: "Help Center", subtitle: "FAQs and guides")
                                 Divider().background(Color.white.opacity(0.1))
-                                SettingsRow(icon: "envelope", iconColor: .gray, title: "Contact Support", subtitle: "Get help from our team", action: {})
+                                SettingsRow(icon: "envelope", iconColor: .gray, title: "Contact Support", subtitle: "Get help from our team")
                                 Divider().background(Color.white.opacity(0.1))
-                                SettingsRow(icon: "info.circle", iconColor: .gray, title: "About Habyss", subtitle: "Version 1.0.4 • Void Build", action: {})
+                                SettingsRow(icon: "info.circle", iconColor: .gray, title: "About Habyss", subtitle: "Version 1.0.4 • Void Build")
                             }
                         }
                         
@@ -188,38 +196,39 @@ struct SettingsRow: View {
     var iconColor: Color
     var title: String
     var subtitle: String?
-    var action: () -> Void
+    // Removed action closure, use NavigationLink wrapper or Button wrapper externally
     
     var body: some View {
-        Button(action: action) {
-            HStack(spacing: 16) {
-                ZStack {
-                    Circle()
-                        .fill(iconColor.opacity(0.2))
-                        .frame(width: 36, height: 36)
-                    Image(systemName: icon)
-                        .foregroundStyle(iconColor)
-                        .font(.system(size: 16))
-                }
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.body)
-                        .foregroundStyle(Color.textPrimary)
-                    if let subtitle = subtitle {
-                        Text(subtitle)
-                            .font(.caption)
-                            .foregroundStyle(Color.textSecondary)
-                    }
-                }
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundStyle(Color.textTertiary)
+        HStack(spacing: 16) {
+            ZStack {
+                Circle()
+                    .fill(iconColor.opacity(0.2))
+                    .frame(width: 36, height: 36)
+                Image(systemName: icon)
+                    .foregroundStyle(iconColor)
+                    .font(.system(size: 16))
             }
-            .padding(12)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.body)
+                    .foregroundStyle(Color.textPrimary)
+                    .multilineTextAlignment(.leading)
+                if let subtitle = subtitle {
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(Color.textSecondary)
+                        .multilineTextAlignment(.leading)
+                }
+            }
+            
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundStyle(Color.textTertiary)
         }
+        .padding(12)
+        .contentShape(Rectangle()) // Make full row tappable
     }
 }

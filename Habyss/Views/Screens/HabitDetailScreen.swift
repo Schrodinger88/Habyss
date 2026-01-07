@@ -186,9 +186,9 @@ struct HabitDetailScreen: View {
     func calculateStreak(for habit: Habit) -> Int {
         // Reuse logic from HabitManager or duplicate for now
         // This is a simplified "current streak" view
-        var streak = 0
+        let streak = 0
         let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
+        _ = calendar.startOfDay(for: Date())
         
         // Simple consecutive check backwards
         // (This is NOT robust for gaps/schedule, but MVP for UI)
