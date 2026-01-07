@@ -11,6 +11,9 @@ struct ProfileScreen: View {
                 
                 ScrollView {
                     VStack(spacing: 32) {
+                        // Spacer for Header
+                        Color.clear.frame(height: 60)
+                        
                         // Profile Section
                         VStack(spacing: 12) {
                             ZStack {
@@ -113,15 +116,37 @@ struct ProfileScreen: View {
                             .background(Color.red.opacity(0.1))
                             .cornerRadius(12)
                         }
-                        .padding(.bottom, 40)
+                        .padding(.bottom, 20)
                         
-                        Text("\"Descend into discipline\"")
-                            .font(.caption)
-                            .italic()
-                            .foregroundStyle(Color.textTertiary)
-                            .padding(.bottom, 100)
+                        // Footer
+                        VStack(spacing: 4) {
+                            Text("\"Descend into discipline\"")
+                                .font(.caption)
+                                .italic()
+                                .foregroundStyle(Color.textTertiary)
+                            Text("v1.0.4 • Void Build")
+                                .font(.caption2)
+                                .foregroundStyle(Color.textTertiary.opacity(0.6))
+                        }
+                        .padding(.bottom, 100)
                     }
                     .padding(.horizontal)
+                }
+                
+                // Fixed Header
+                VStack {
+                    HStack {
+                        Spacer()
+                        Text("PROFILE")
+                            .font(.system(size: 24, weight: .black)) // Lexend 900
+                            .tracking(0)
+                            .foregroundStyle(Color.textPrimary)
+                        Spacer()
+                    }
+                    .padding(.vertical, 12)
+                    .background(Color.habyssBlack.opacity(0.9).blur(radius: 10).ignoresSafeArea(edges: .top))
+                    
+                    Spacer()
                 }
             }
             .sheet(isPresented: $showEditProfile) {
@@ -134,6 +159,11 @@ struct ProfileScreen: View {
 struct SettingsSection<Content: View>: View {
     var title: String
     @ViewBuilder var content: Content
+    
+    init(title: String, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.content = content()
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {

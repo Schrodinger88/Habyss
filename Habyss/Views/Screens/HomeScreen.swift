@@ -11,147 +11,61 @@ struct HomeScreen: View {
     @State private var showAIModal = false
     @State private var showNotificationsModal = false
     
+    // UI State for Parity
+    @State private var displayedQuote = ""
+    private let quoteText = "Consistency beats intensity."
+    
+    var goals: [Habit] {
+        habits.filter { $0.isGoal }
+    }
+    
     var todaysHabits: [Habit] {
         habits.filter { habit in
+            guard !habit.isGoal else { return false } // Exclude Goals
             let calendar = Calendar.current
             let today = calendar.startOfDay(for: Date())
-            
-            // Check if the habit is scheduled for today
-            let isScheduledToday = habit.schedule.contains { day in
+            let isScheduledToday = habit.taskDays.contains { day in // Fixed property name 'taskDays'
                 let weekday = calendar.component(.weekday, from: today)
-                return day.rawValue == weekday
+                let symbol = calendar.shortWeekdaySymbols[weekday - 1].lowercased()
+                return day == symbol
             }
-            
-            // If the habit is scheduled for today, include it
             return isScheduledToday
         }
     }
     
-    var body: some View {
-        NavigationView {
-            ZStack {
-                Color.habyssBlack.ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: 20) {
-                        // Header: Profile & Notifications
-                        HStack {
-                            ZStack {
-                                Circle()
-                                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                                    .frame(width: 44, height: 44)
-                                
-                                Image(systemName: "person.fill")
-                                    .foregroundStyle(Color.textSecondary)
-                            }
-                            
-                            Spacer()
-                            
-                            HStack(spacing: 12) {
-                                Button(action: { showAIModal = true }) {
-                                    Circle()
-                                        .fill(LinearGradient(colors: [.habyssBlue, .habyssPurple], startPoint: .topLeading, endPoint: .bottomTrailing))
-                                        .frame(width: 40, height: 40)
-                                        .overlay(Image(systemName: "sparkles").foregroundStyle(.white))
-                                }
-                                
-                                Button(action: { showNotificationsModal = true }) {
-                                    Circle()
-                                        .fill(Color.white.opacity(0.05))
-                                        .frame(width: 40, height: 40)
-                                        .overlay(Image(systemName: "bell.fill").foregroundStyle(.white))
-                                }
-                            }
-                        }
-                        .padding(.horizontal)
-                        .padding(.top, 10)
-                        
-                        // Motivational Quote (Typewriter Style)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Consistency beats intensity.")
-                                .font(.subheadline)
-                                .fontWeight(.bold)
-                                .foregroundStyle(Color.white)
-                            Text("You've got this.")
-                                .font(.caption)
-                                .foregroundStyle(Color.habyssBlue)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal)
-                        
-                        // Goals Progress Bar Summary
-                        Button(action: { showGoalsModal = true }) {
-                            VoidCard(intensity: 40, cornerRadius: 16) {
-                                HStack {
-                                    VStack(alignment: .leading) {
-                                        Text("Mission Status")
-                                            .font(.caption)
-                                            .fontWeight(.bold)
-                                            .foregroundStyle(Color.textSecondary)
-                                        Text("85% On Track")
-                                            .font(.title3)
-                                            .fontWeight(.bold)
-                                            .foregroundStyle(Color.white)
-                                    }
-                                    Spacer()
-                                    CircularProgress(progress: 0.85, size: 40, color: .habyssBlue)
-                                }
-                                .padding(12)
-                            }
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.horizontal)
+    // ... (rest of body) ...
 
-                        // Bento Grid Stats
-                        HStack(spacing: 12) {
-                            Button(action: { showStreakModal = true }) {
-                                StreakCard(streak: 12, completionTier: 3)
-                            }
-                            .buttonStyle(.plain)
-                            
-                            Button(action: { showConsistencyModal = true }) {
-                                ConsistencyCard(score: 88)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                        .padding(.horizontal)
-                        
-                        // Today's Habits
-                        VStack(alignment: .leading, spacing: 12) {
+                        // Habits List ("Quick Habits")
+                        VStack(alignment: .leading, spacing: 16) {
                             HStack {
-                                Text("TODAY'S HABITS")
-                                    .font(.caption)
-                                    .fontWeight(.bold)
-                                    .foregroundStyle(Color.textSecondary)
-                                    .tracking(1)
-                                
+                                Text("Today's Habits")
+                                    .font(.headline)
+                                    .foregroundStyle(.white)
                                 Spacer()
-                                
-                                NavigationLink(destination: RoadmapScreen()) { // Link to Calendar
+                                NavigationLink(destination: RoadmapScreen()) {
                                     Text("See All")
                                         .font(.caption)
-                                        .foregroundStyle(Color.textTertiary)
+                                        .foregroundStyle(Color.white.opacity(0.5))
                                 }
                             }
-                            .padding(.horizontal)
                             
                             if todaysHabits.isEmpty {
-                                ContentUnavailableView("No Mission", systemImage: "moon.stars.fill", description: Text("Rest day."))
-                                    .foregroundStyle(Color.textSecondary)
+                                ContentUnavailableView("All Clear", systemImage: "checkmark.circle", description: Text("No habits scheduled for today."))
                             } else {
                                 ForEach(todaysHabits) { habit in
                                     NavigationLink(destination: HabitDetailScreen(habit: habit)) {
-                                        HabitRow(habit: habit)
+                                        HabitRow(habit: habit, goalName: goals.first(where: { $0.id == habit.goalId })?.name)
                                     }
                                     .buttonStyle(.plain)
                                 }
+                            }
                             }
                         }
                         .padding(.bottom, 100)
                     }
                 }
             }
-            .sheet(isPresented: $showGoalsModal) { GoalsGridModal(isPresented: $showGoalsModal) }
+             .sheet(isPresented: $showGoalsModal) { GoalsGridModal(isPresented: $showGoalsModal) }
             .sheet(isPresented: $showStreakModal) { StreakModal(isPresented: $showStreakModal) }
             .sheet(isPresented: $showConsistencyModal) { ConsistencyModal(isPresented: $showConsistencyModal) }
             .fullScreenCover(isPresented: $showAIModal) { AIAgentView(isPresented: $showAIModal) }
@@ -163,74 +77,79 @@ struct HomeScreen: View {
 // Simple Habit Row for the list
 struct HabitRow: View {
     var habit: Habit
+    var goalName: String?
     @Environment(\.modelContext) private var modelContext
     
     var isCompleted: Bool {
-        // Simple check (in real app use Manager logic)
-        // For MVP UI demo just checking if completions has today
         let calendar = Calendar.current
         return habit.completions.contains { calendar.isDateInToday($0.date) }
     }
     
     var body: some View {
         VoidCard(intensity: 60, cornerRadius: 16) {
-            HStack {
-                // Icon
+            HStack(spacing: 16) {
+                // Icon / Left Checkmark
                 ZStack {
-                    Circle()
-                        .fill(Color(hex: habit.color).opacity(0.2))
-                        .frame(width: 40, height: 40)
-                    
-                    Image(systemName: "star.fill") // TODO: Habit Icon mapping
-                        .foregroundStyle(Color(hex: habit.color))
+                    if isCompleted {
+                        Circle()
+                            .fill(Color(hex: habit.color).opacity(0.2))
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(Color(hex: habit.color))
+                    } else {
+                        Circle()
+                            .fill(Color(hex: habit.color).opacity(0.1))
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 14))
+                            .foregroundStyle(Color(hex: habit.color).opacity(0.5))
+                    }
                 }
+                .frame(width: 44, height: 44)
                 
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(habit.name)
-                        .font(.body)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(Color.textPrimary)
-                        .strikethrough(isCompleted)
-                        .opacity(isCompleted ? 0.6 : 1)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(isCompleted ? Color.textSecondary : Color.textPrimary)
                     
-                    if let details = habit.details {
-                        Text(details)
+                    if let goal = goalName {
+                         Text(goal.capitalized)
                             .font(.caption)
-                            .foregroundStyle(Color.textSecondary)
-                            .lineLimit(1)
+                            .foregroundStyle(Color.textTertiary)
+                    } else {
+                        Text(habit.category.capitalized)
+                            .font(.caption)
+                            .foregroundStyle(Color.textTertiary)
                     }
                 }
                 
                 Spacer()
                 
-                // Checkbox
+                // Right Checkbox (Toggle)
                 Button {
                     toggleCompletion()
                 } label: {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(isCompleted ? Color(hex: habit.color) : Color.white.opacity(0.2), lineWidth: 2)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(isCompleted ? Color(hex: habit.color) : Color.clear)
-                            )
-                            .frame(width: 28, height: 28)
-                        
-                        if isCompleted {
+                         if isCompleted {
+                            Circle()
+                                .fill(Color(hex: habit.color))
+                                .frame(width: 32, height: 32)
                             Image(systemName: "checkmark")
                                 .font(.system(size: 14, weight: .bold))
                                 .foregroundStyle(.white)
+                        } else {
+                            Circle()
+                                .stroke(Color(hex: habit.color).opacity(0.5), lineWidth: 2)
+                                .frame(width: 32, height: 32)
                         }
                     }
                 }
             }
-            .contentShape(Rectangle())
+            .padding(16)
         }
-        .frame(height: 70)
+        .frame(height: 80)
     }
     
     func toggleCompletion() {
-        // Quick inline logic for UI demo - should move to Manager
         let today = Date()
         let calendar = Calendar.current
         
@@ -247,22 +166,4 @@ struct HabitRow: View {
 #Preview {
     HomeScreen()
         .modelContainer(for: [Habit.self, Completion.self, Profile.self], inMemory: true)
-}
-
-struct CircularProgress: View {
-    let progress: Double
-    let size: CGFloat
-    let color: Color
-    
-    var body: some View {
-        ZStack {
-            Circle()
-                .stroke(Color.white.opacity(0.1), lineWidth: 4)
-            Circle()
-                .trim(from: 0, to: progress)
-                .stroke(color, style: StrokeStyle(lineWidth: 4, lineCap: .round))
-                .rotationEffect(.degrees(-90))
-        }
-        .frame(width: size, height: size)
-    }
 }

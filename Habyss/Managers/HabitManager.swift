@@ -65,7 +65,7 @@ class HabitManager {
         
         let calendar = Calendar.current
         var streak = 0
-        let today = Date()
+
         
         // Check if completed today or yesterday to start streak
         guard let first = sortedCompletions.first else { return 0 }

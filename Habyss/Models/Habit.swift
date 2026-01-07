@@ -20,6 +20,7 @@ final class Habit {
     
     // Goals
     var isGoal: Bool
+    var goalId: UUID? // Link to parent Goal (Habit where isGoal=true)
     var goalPeriod: String // "daily", "weekly", "monthly"
     var goalValue: Int
     var unit: String
@@ -47,6 +48,7 @@ final class Habit {
         taskDays: [String] = [],
         reminders: [String] = [],
         isGoal: Bool = false,
+        goalId: UUID? = nil,
         goalPeriod: String = "daily",
         goalValue: Int = 1,
         unit: String = "count",
@@ -68,6 +70,7 @@ final class Habit {
         self.taskDays = taskDays
         self.reminders = reminders
         self.isGoal = isGoal
+        self.goalId = goalId
         self.goalPeriod = goalPeriod
         self.goalValue = goalValue
         self.unit = unit

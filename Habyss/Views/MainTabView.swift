@@ -34,50 +34,63 @@ struct MainTabView: View {
     }
 }
 
+// Custom Glass Dock matching Expo layout (Split Pill + Orb)
 struct GlassDock: View {
     @Binding var selectedTab: MainTabView.Tab
     @State private var showCreationModal = false
     
     var body: some View {
-        VoidCard(intensity: 90, cornerRadius: 40) {
-            HStack(spacing: 0) {
-                TabButton(icon: "house.fill", tab: .home, selected: $selectedTab)
-                TabButton(icon: "calendar", tab: .roadmap, selected: $selectedTab)
+        HStack(alignment: .bottom, spacing: 12) {
+            // 1. Navigation Pill
+            ZStack {
+                // Blur Background
+                Capsule()
+                    .fill(.ultraThinMaterial)
                 
-                // Central Action Button (Add)
-                Button {
-                    showCreationModal = true
-                } label: {
-                    ZStack {
-                        Circle()
-                            .fill(LinearGradient(
-                                colors: [.habyssBlue, .habyssPurple],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ))
-                            .frame(width: 50, height: 50)
-                            .shadow(color: .habyssBlue.opacity(0.5), radius: 10, x: 0, y: 5)
-                        
-                        Image(systemName: "plus")
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundStyle(.white)
-                    }
-                }
-                .offset(y: -20)
-                .padding(.horizontal, 10)
-                .sheet(isPresented: $showCreationModal) {
-                    HabitCreationView()
-                        .presentationDetents([.fraction(0.8), .large])
-                        .presentationDragIndicator(.visible)
-                }
+                // Glass Border
+                Capsule()
+                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
                 
-                TabButton(icon: "person.2.fill", tab: .community, selected: $selectedTab)
-                TabButton(icon: "person.fill", tab: .profile, selected: $selectedTab)
+                HStack(spacing: 0) {
+                    TabButton(icon: "house.fill", tab: .home, selected: $selectedTab)
+                    TabButton(icon: "map.fill", tab: .roadmap, selected: $selectedTab) // Calendar/Roadmap
+                    TabButton(icon: "person.3.fill", tab: .community, selected: $selectedTab)
+                    TabButton(icon: "gearshape.fill", tab: .profile, selected: $selectedTab) // Settings/Profile logic uses Gear icon
+                }
             }
-            .padding(.vertical, 10)
-            .padding(.horizontal, 10)
+            .frame(height: 64)
+            .frame(maxWidth: 280) // Constrain width like Expo
+            .shadow(color: Color.black.opacity(0.3), radius: 12, x: 0, y: 4)
+            
+            // 2. Creation Orb (Floating Action Button)
+            Button {
+                showCreationModal = true
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(LinearGradient(
+                            colors: [.habyssBlue, .habyssPurple],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ))
+                        .overlay(
+                            Circle()
+                                .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                        )
+                    
+                    Image(systemName: "plus")
+                        .font(.system(size: 32, weight: .bold)) // Larger icon
+                        .foregroundStyle(.white)
+                }
+            }
+            .frame(width: 64, height: 64)
+            .shadow(color: Color.black.opacity(0.4), radius: 12, x: 0, y: 4)
+            .sheet(isPresented: $showCreationModal) {
+                HabitCreationView()
+                    .presentationDetents([.fraction(0.8), .large])
+                    .presentationDragIndicator(.visible)
+            }
         }
-        .frame(height: 70)
     }
     
     struct TabButton: View {
@@ -87,17 +100,20 @@ struct GlassDock: View {
         
         var body: some View {
             Button {
+                let generator = UISelectionFeedbackGenerator()
+                generator.selectionChanged()
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                     selected = tab
                 }
             } label: {
                 VStack {
                     Image(systemName: icon)
-                        .font(.system(size: 20))
-                        .foregroundStyle(selected == tab ? Color.habyssBlue : Color.textSecondary)
-                        .scaleEffect(selected == tab ? 1.1 : 1.0)
+                        .font(.system(size: 24))
+                        .foregroundStyle(selected == tab ? Color.habyssBlue : Color.white.opacity(0.4)) // Match Expo icon colors
+                        .scaleEffect(selected == tab ? 1.15 : 1.0)
                 }
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .contentShape(Rectangle())
             }
         }
     }
